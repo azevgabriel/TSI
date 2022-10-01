@@ -12,7 +12,7 @@ import java.util.ArrayList;
  */
 
 public class AlgGen {
-    static int numberOfPopulation = 1000;
+    static int numberOfPopulation = 100000;
     static int numberOfSelections = 5;
   
     public static void main(String[] args) {
@@ -44,12 +44,26 @@ public class AlgGen {
         }
     
         
-        Population population = new Population(nVertex, graph, numberOfPopulation);
-        Individual[] bestPopulation = population.naturalSelection(numberOfSelections);
+        Population population = new Population(nVertex, numberOfPopulation);
+        Part[] bestParts = population.getParts();
+        population.Populate(bestParts, graph);
+        
+        
+        Individual[] bestPopulation = population.naturalSelection(numberOfSelections, nVertex);
+        
       
-        for (int i = 0; i < numberOfSelections; i++) {
-            bestPopulation[i].print();
-        }     
+        for (int i = 0; i < bestParts.length; i++) {
+            if(bestParts[i] == null){
+                break;
+            }
+            System.out.println("DNA: " + bestParts[i].getDNA());
+            System.out.println("Parent Weight: " + bestParts[i].getParentWeight());
+            System.out.println("Repeat:" + bestParts[i].getNumberOfRepeatability());
+        }    
+        
+        //for (int i = 0; i < numberOfSelections; i++) {
+        //    bestPopulation[i].print();
+        //}     
         
     }
     

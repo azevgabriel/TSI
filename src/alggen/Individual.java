@@ -95,17 +95,12 @@ public class Individual {
         if(lastPosition == -1) {
             this.weight = this.weight + badNews;
         } else {
-            int weight = graph[lastPosition][firstPosition];
-
-            if(weight != 0) this.weight = this.weight + weight;
+            if(graph[lastPosition][firstPosition] != 0) 
+                this.weight = this.weight + graph[lastPosition][firstPosition];
             else this.weight = this.weight + badNews;
         }
         
     }
-    
-    //public int[] bestPartsOfIndividual(Individual bestIndividual, int lengthOfPart) {
-    //    int rest = bestIndividual.getLength() % lengthOfPart;
-    //}
     
     public int[] getNodes() {
         return this.nodes;
