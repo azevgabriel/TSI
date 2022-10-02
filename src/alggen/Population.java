@@ -5,7 +5,7 @@
 package alggen;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import static alggen.Array.searchIndexByValue;
 
 /**
  * @RA 201811020032
@@ -13,37 +13,44 @@ import java.util.Arrays;
  */
 public class Population {
 
-    private final Individual[] individuals;
-    private final Part[] parts;
+    private Individual[] individuals;
+    private Part[] parts;
+    private int numberOfParts;
     private final int sizeOfPopulation;
+    private Individual[] bestPopulation;
+    private Part[] bestParts;
+    private int numberOfSelectedParts;
 
-    public Population(int numberOfNodes, int sizeOfPopulation) {
+
+    public Population(int numberOfNodes, int sizeOfPopulation, int[][] graph, int numberOfSelectedParts) {
         this.sizeOfPopulation = sizeOfPopulation;
         this.individuals = new Individual[sizeOfPopulation];
-        this.parts = new Part[sizeOfPopulation];
+        this.parts = new Part[sizeOfPopulation * numberOfNodes];
+        this.numberOfParts = 0;
+        this.numberOfSelectedParts = numberOfSelectedParts;
+        this.bestParts = new Part[numberOfSelectedParts];
         for (int i = 0; i < sizeOfPopulation; i++) {
-            this.individuals[i] = new Individual(numberOfNodes);
+            this.individuals[i] = new Individual(numberOfNodes, 0, graph);
+            this.individuals[i].createTotalRandom(1);
         }
     }
     
-    public void Populate(Part[] parts, int[][] graph){
-        if(parts[0] != null) {
-            for (int i = 0; i < sizeOfPopulation - parts.length; i++) {
-                this.individuals[i].create(graph, 1);
-            }
-        } else {
-            for (int i = 0; i < sizeOfPopulation; i++) {
-                this.individuals[i].create(graph, 1);
-            }   
-
+    public void rePopulate(int numberOfNodes, int[][] graph, double mutationRate){
+        this.individuals = new Individual[this.sizeOfPopulation];
+        
+        selectBestPart(this.numberOfSelectedParts);
+        
+        for(int i = 0; i < (this.sizeOfPopulation); i++){
+            this.individuals[i] = new Individual(numberOfNodes, mutationRate, graph);
+            this.individuals[i].createRandomWithPossibilityMutation(1, this.bestParts, this.numberOfSelectedParts);
         }
     }
 
-    public Individual[] naturalSelection(int numberOfSelections, int individualLength) {
-        Individual[] bestPopulation = new Individual[numberOfSelections];
+    public Individual[] naturalSelection(int numberOfSelectedIndividuals, int individualLength, int lastWeight) {
+        bestPopulation = new Individual[numberOfSelectedIndividuals];
 
         for (int i = 0; i < this.sizeOfPopulation; i++) {
-            for (int j = 0; j < numberOfSelections; j++) {
+            for (int j = 0; j < numberOfSelectedIndividuals; j++) {
                 if (bestPopulation[j] == null) {
                     bestPopulation[j] = new Individual(individuals[i]);
                     break;
@@ -51,6 +58,46 @@ public class Population {
                     bestPopulation[j] = new Individual(individuals[i]);
                     break;
                 }
+            }
+        }
+        
+//        if(bestPopulation[0].getWeight() > lastWeight){
+//            int diff = bestPopulation[0].getWeight() - lastWeight;
+//            for(int i = 0; i < this.numberOfParts; i++){
+//                this.parts[i].punishment(diff);
+//            }
+//        }
+
+        if(this.bestParts[0] != null || this.parts[0] != null) {
+            for(int i = 0; i < this.numberOfSelectedParts; i++) {
+                System.out.println(this.parts[i].getDNA());
+            }
+            
+            for(int i = 0; i < this.numberOfSelectedParts; i++) {
+                int index = -1;
+                for(int j = 0; j < this.numberOfParts; j++) {
+                   if(this.parts[j] == this.bestParts[i]) {
+                       index = j;
+                       break;
+                   }
+                }
+                if (this.parts != null || index > 0 || index < this.parts.length) {;
+                    Part[] anotherArray = new Part[this.parts.length];
+
+                    for (int a = 0, k = 0; i < this.numberOfParts; i++) {
+                        if (a == index) {
+                            continue;
+                        }
+                        anotherArray[k++] = this.parts[a];
+                    }
+                                                          
+                    this.parts = anotherArray; 
+                    this.numberOfSelectedParts = this.numberOfSelectedParts - 1;
+                }
+            }
+        
+            for(int i = 0; i < this.numberOfSelectedParts; i++) {
+                System.out.println(this.parts[i].getDNA());
             }
         }
         
@@ -63,7 +110,7 @@ public class Population {
             }
         }
         
-        for (int i = 0; i < numberOfSelections; i++) {
+        for (int i = 0; i < numberOfSelectedIndividuals; i++) {
             int[] compareOne = bestPopulation[i].getNodes();
             String compareOneStringify = "";
             
@@ -72,7 +119,7 @@ public class Population {
                 else compareOneStringify = compareOneStringify + compareOne[j];
             }
             
-            for (int j = i + 1; j < numberOfSelections; j++) {
+            for (int j = i + 1; j < numberOfSelectedIndividuals; j++) {
                 int[] compareTwo = bestPopulation[j].getNodes();
                 String compareTwoStringify = "";
                         
@@ -93,31 +140,100 @@ public class Population {
                         }
                         
                         if(compareOneStringify.contains(compareTwoStringify)){
-                            int meanWeight = Math.round((bestPopulation[i].getWeight() + bestPopulation[j].getWeight()) / 2);
+                            int valueNode = Integer.parseInt(compareTwoStringify.split(",")[0]);
+                                    
+                            int indexOne = searchIndexByValue(valueNode, compareOne);
+                            int indexTwo = searchIndexByValue(valueNode, compareTwo);
+                            String compareOneId = compareTwoStringify + "-" + indexOne + "-" + bestPopulation[i].getWeight();
+                            String compareTwoId = compareTwoStringify + "-" + indexTwo + "-" + bestPopulation[j].getWeight();
                             
-                            for (int c = 0; c < parts.length; c++){
+                            for (int c = 0; c < this.numberOfParts + 1; c++){
                                 if(this.parts[c] == null){
-                                    this.parts[c] = new Part(compareTwoStringify, meanWeight);
-                                    break;
-                                } else if (this.parts[c].getDNA() == compareTwoStringify) {
-                                    this.parts[c].incrementsNumberOfRepeatability();
-                                }
+                                    
+                                    if(compareOneId.equals(compareTwoId)){
+                                        this.parts[this.numberOfParts] = new Part(compareTwoStringify, bestPopulation[i].getWeight(), indexOne);
+                                        this.parts[this.numberOfParts].repeat();
+                                        this.numberOfParts = this.numberOfParts + 1;
+                                    } else {
+                                        this.parts[this.numberOfParts] = new Part(compareTwoStringify, bestPopulation[i].getWeight(), indexOne);
+                                        this.parts[this.numberOfParts + 1] = new Part(compareTwoStringify, bestPopulation[j].getWeight(), indexTwo);
+                                        this.numberOfParts = this.numberOfParts + 2;
+                                    }
                                 
+                                    break;
+                                } 
+                                
+                                if (this.parts[c].getDNA().equals(compareTwoStringify)) {
+                                    
+                                    if (compareOneId.equals(compareTwoId)) {
+                                        if(this.parts[c].getId().equals(compareOneId)) {
+                                            this.parts[c].repeat();
+                                            this.parts[c].repeat();
+                                        } else {
+                                            this.parts[this.numberOfParts] = new Part(compareTwoStringify, bestPopulation[i].getWeight(), indexOne);
+                                            this.parts[this.numberOfParts].repeat();
+                                            this.numberOfParts = this.numberOfParts + 1;
+                                        }
+                                    } else {
+                                        if(this.parts[c].getId().equals(compareOneId)) {
+                                            this.parts[c].repeat();
+                                        } else {
+                                            this.parts[this.numberOfParts] = new Part(compareTwoStringify, bestPopulation[j].getWeight(), indexOne);
+                                            this.numberOfParts = this.numberOfParts + 1;
+                                        }
+
+                                        if(this.parts[c].getId().equals(compareTwoId)) {
+                                            this.parts[c].repeat();
+                                        } else {
+                                            this.parts[this.numberOfParts] = new Part(compareTwoStringify, bestPopulation[j].getWeight(), indexTwo);
+                                            this.numberOfParts = this.numberOfParts + 1;
+                                        }
+                                    }
+                                    
+                                    break;
+                                }
                             }
-                            
                         }
                     }
+                    
                     
                     auxLength = auxLength - 1;
                 }
             }    
-        }    
+        }
         
         return bestPopulation;
     }
     
     public Part[] getParts() {
         return parts;
+    }
+    
+    public void selectBestPart(int numberOfSelectedParts) {
+        if(numberOfSelectedParts > this.numberOfParts){
+            this.numberOfSelectedParts = this.numberOfParts;
+        } else {
+            this.numberOfSelectedParts = numberOfSelectedParts;
+        }
+              
+        for(int i = 0; i < this.numberOfParts; i++){
+            for(int j = 0; j < this.numberOfSelectedParts; j++){
+                if(bestParts[j] == null){
+                    this.bestParts[j] = this.parts[i];
+                    break;
+                } else if (this.parts[i].getRelevance() < this.bestParts[j].getRelevance()) {
+                    this.bestParts[j] = this.parts[i];
+                }
+            }
+        }
+    }
+    
+    public int getNumberOfParts() {
+        return numberOfParts;
+    }
+    
+    public Part[] getBestPart() {
+        return this.bestParts;
     }
     
 }

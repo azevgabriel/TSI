@@ -5,6 +5,7 @@
 package alggen;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * @RA 201811020032
@@ -12,8 +13,11 @@ import java.util.ArrayList;
  */
 
 public class AlgGen {
-    static int numberOfPopulation = 100000;
-    static int numberOfSelections = 5;
+    static int numberOfPopulation = 200000;
+    static int numberOfSelectedIndividuals = 20;
+    static int numberOfSelectedParts = 5;
+    static int numberOfGenerations = 10;
+    static double mutationRate = 0.4;
   
     public static void main(String[] args) {
         
@@ -42,29 +46,23 @@ public class AlgGen {
                 }
             }
         }
-    
         
-        Population population = new Population(nVertex, numberOfPopulation);
-        Part[] bestParts = population.getParts();
-        population.Populate(bestParts, graph);
+        int WorstWeightOfIndividual = 10000;
         
+        Population population = new Population(nVertex, numberOfPopulation, graph, numberOfSelectedParts);
+        Individual[] bestPopulation = population.naturalSelection(numberOfSelectedIndividuals, nVertex, WorstWeightOfIndividual);
         
-        Individual[] bestPopulation = population.naturalSelection(numberOfSelections, nVertex);
+        System.out.println("Geration | Weight (Best Individual) | Patch (Best Part) | Parent Weight (Best Part) | Relevance (Best Part)");
+        System.out.println(0 + " | " + bestPopulation[0].getWeight() + " | NaN | NaN | NaN | ");
         
-      
-        for (int i = 0; i < bestParts.length; i++) {
-            if(bestParts[i] == null){
-                break;
-            }
-            System.out.println("DNA: " + bestParts[i].getDNA());
-            System.out.println("Parent Weight: " + bestParts[i].getParentWeight());
-            System.out.println("Repeat:" + bestParts[i].getNumberOfRepeatability());
-        }    
+        Part[] bestParts = population.getBestPart();
         
-        //for (int i = 0; i < numberOfSelections; i++) {
-        //    bestPopulation[i].print();
-        //}     
-        
+        for(int i = 0; i < numberOfGenerations - 1; i++) {
+            int lastWeight = bestPopulation[0].getWeight();
+            population.rePopulate(nVertex, graph, mutationRate);
+            bestPopulation = population.naturalSelection(numberOfSelectedIndividuals, nVertex, lastWeight);
+            bestParts = population.getBestPart();
+            System.out.println(i + 1 + " | " + bestPopulation[0].getWeight() + " | " + bestParts[0].getDNA() + " | " + bestParts[0].getParentWeight() + " | " + bestParts[0].getRelevance());
+        }
     }
-    
 }
