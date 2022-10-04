@@ -38,11 +38,14 @@ public class Part {
     
     public void repeat(){
         this.numberOfRepeatability = this.numberOfRepeatability + 1;
-        this.relevance = this.relevance - 5;
     }
     
     public void punishment(int punishment){
-        this.relevance = this.relevance + punishment;
+        this.relevance = (int) (this.relevance + Math.round(punishment * 1.8));
+    }
+    
+    public void reward (int reward) {
+        this.relevance = (int) (this.relevance - Math.round(reward * 1.2));
     }
     
     public String getId() {

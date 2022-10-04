@@ -25,23 +25,25 @@ public class Population {
     public Population(int numberOfNodes, int sizeOfPopulation, int[][] graph, int numberOfSelectedParts) {
         this.sizeOfPopulation = sizeOfPopulation;
         this.individuals = new Individual[sizeOfPopulation];
-        this.parts = new Part[sizeOfPopulation * numberOfNodes];
+        this.parts = new Part[sizeOfPopulation * 100];
         this.numberOfParts = 0;
         this.numberOfSelectedParts = numberOfSelectedParts;
         this.bestParts = new Part[numberOfSelectedParts];
         for (int i = 0; i < sizeOfPopulation; i++) {
-            this.individuals[i] = new Individual(numberOfNodes, 0, graph);
+            this.individuals[i] = new Individual(numberOfNodes, 0, 0, graph);
             this.individuals[i].createTotalRandom(1);
         }
     }
     
-    public void rePopulate(int numberOfNodes, int[][] graph, double mutationRate){
+    public void rePopulate(int numberOfNodes, int[][] graph, double mutationRate, double mutationPositionRate){
         this.individuals = new Individual[this.sizeOfPopulation];
+        
+        
         
         selectBestPart(this.numberOfSelectedParts);
         
         for(int i = 0; i < (this.sizeOfPopulation); i++){
-            this.individuals[i] = new Individual(numberOfNodes, mutationRate, graph);
+            this.individuals[i] = new Individual(numberOfNodes, mutationRate, mutationPositionRate, graph);
             this.individuals[i].createRandomWithPossibilityMutation(1, this.bestParts, this.numberOfSelectedParts);
         }
     }
@@ -60,19 +62,8 @@ public class Population {
                 }
             }
         }
-        
-//        if(bestPopulation[0].getWeight() > lastWeight){
-//            int diff = bestPopulation[0].getWeight() - lastWeight;
-//            for(int i = 0; i < this.numberOfParts; i++){
-//                this.parts[i].punishment(diff);
-//            }
-//        }
 
         if(this.bestParts[0] != null || this.parts[0] != null) {
-            for(int i = 0; i < this.numberOfSelectedParts; i++) {
-                System.out.println(this.parts[i].getDNA());
-            }
-            
             for(int i = 0; i < this.numberOfSelectedParts; i++) {
                 int index = -1;
                 for(int j = 0; j < this.numberOfParts; j++) {
@@ -81,24 +72,14 @@ public class Population {
                        break;
                    }
                 }
-                if (this.parts != null || index > 0 || index < this.parts.length) {;
-                    Part[] anotherArray = new Part[this.parts.length];
-
-                    for (int a = 0, k = 0; i < this.numberOfParts; i++) {
-                        if (a == index) {
-                            continue;
-                        }
-                        anotherArray[k++] = this.parts[a];
-                    }
-                                                          
-                    this.parts = anotherArray; 
-                    this.numberOfSelectedParts = this.numberOfSelectedParts - 1;
+                
+                if(bestPopulation[0].getWeight() > lastWeight){
+                    this.parts[index].punishment(bestPopulation[0].getWeight() - lastWeight);
+                } else {
+                    this.parts[index].reward(lastWeight - bestPopulation[0].getWeight());
                 }
             }
-        
-            for(int i = 0; i < this.numberOfSelectedParts; i++) {
-                System.out.println(this.parts[i].getDNA());
-            }
+            
         }
         
         ArrayList<Integer> equalsParts = new ArrayList<>();
@@ -220,6 +201,8 @@ public class Population {
             for(int j = 0; j < this.numberOfSelectedParts; j++){
                 if(bestParts[j] == null){
                     this.bestParts[j] = this.parts[i];
+                    break;
+                } else if (this.parts[i] == null) { 
                     break;
                 } else if (this.parts[i].getRelevance() < this.bestParts[j].getRelevance()) {
                     this.bestParts[j] = this.parts[i];

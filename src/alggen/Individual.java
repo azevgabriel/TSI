@@ -20,14 +20,18 @@ public class Individual {
     private int weight; 
     private final int[] positions;
     private final int mutationRate;
+    private final int mutationPositionRate;
     private final int[][] graph;
+    private Part partSelected;
     
-    public Individual(int numberOfNodes, double mutationRate, int[][] graph) {
+    public Individual(int numberOfNodes, double mutationRate, double mutationPositionRate, int[][] graph) {
         this.length = numberOfNodes;
         this.nodes = new int[numberOfNodes];
         this.positions = new int[numberOfNodes];
         this.mutationRate = (int)(mutationRate * 100);
+        this.mutationPositionRate = (int)(mutationPositionRate * 100);
         this.graph = graph;
+        this.partSelected = null;
         
         for(int i = 0; i < numberOfNodes; i++){
             this.nodes[i] = -1;
@@ -42,6 +46,8 @@ public class Individual {
         this.positions = individual.getPositions();
         this.mutationRate = individual.getMutationRate();
         this.graph = individual.getGraph();
+        this.partSelected = individual.getPartSelected();
+        this.mutationPositionRate = individual.getMutationPositionRate();
     };
     
     public void createTotalRandom(int cofOfMaxInterations) {
@@ -88,7 +94,7 @@ public class Individual {
             //System.out.println(Arrays.toString(positionsRandomized));
         }
         
-        //System.out.println("Way Array: " +Arrays.toString(this.nodes));
+        //System.out.println("Way Array: " + Arrays.toString(this.nodes));
         
         int lastPosition = this.nodes[this.length - 1];
         int firstPosition = this.nodes[0];
@@ -108,14 +114,19 @@ public class Individual {
         int[] positions = this.positions;
         int maxInterations = this.length * cofOfMaxInterations;     
         int mutationChance = Math.round(rnd.nextInt((100 * 1000) / 1000));
+        int mutationPositionChance = Math.round(rnd.nextInt((100 * 1000) / 1000));
         
-        if (mutationChance < mutationRate && numberOfParts > 0) {
-            // Random pick of the part, but then we will implement more pick rate in the best
+        if (mutationChance < this.mutationRate && numberOfParts > 0) {
             int pickPart = Math.round(rnd.nextInt(numberOfParts * 1000)/1000);
 
             String[] partsStringify = parts[pickPart].getDNA().split(",");
             int lengthOfParts = partsStringify.length;
+            
             int positionPickPart = parts[pickPart].getPosition();
+            
+            if (mutationPositionChance < this.mutationPositionRate) positionPickPart = Math.round(rnd.nextInt(((this.length - partsStringify.length) * 1000) / 1000));
+                        
+            this.partSelected = parts[pickPart];
             
             int[] positionsRandomized = positions;
             
@@ -126,8 +137,6 @@ public class Individual {
             }
                      
             positionsRandomized = randomizeArray(rnd, positionsRandomized);
-            
-            // Insight: disabled parts after used
             
             for (int i = 0; i < this.length - lengthOfParts + 1; i++) {
             
@@ -251,6 +260,14 @@ public class Individual {
     
     public int getMutationRate() {
         return this.mutationRate;
+    }
+    
+    public int getMutationPositionRate() {
+        return this.mutationPositionRate;
+    }
+    
+    public Part getPartSelected() {
+        return this.partSelected;
     }
     
     public int[][] getGraph() {
