@@ -35,7 +35,7 @@ public class Population {
         }
     }
     
-    public void rePopulate(int numberOfNodes, int[][] graph, double mutationRate, double mutationPositionRate){
+    public void rePopulate(int numberOfNodes, int[][] graph, double crossingRate, double crossingRandomPositionRate){
         this.individuals = new Individual[this.sizeOfPopulation];
         
         
@@ -43,7 +43,7 @@ public class Population {
         selectBestPart(this.numberOfSelectedParts);
         
         for(int i = 0; i < (this.sizeOfPopulation); i++){
-            this.individuals[i] = new Individual(numberOfNodes, mutationRate, mutationPositionRate, graph);
+            this.individuals[i] = new Individual(numberOfNodes, crossingRate, crossingRandomPositionRate, graph);
             this.individuals[i].createRandomWithPossibilityMutation(1, this.bestParts, this.numberOfSelectedParts);
         }
     }

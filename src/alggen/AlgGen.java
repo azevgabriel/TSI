@@ -16,8 +16,8 @@ public class AlgGen {
     static int numberOfSelectedIndividuals = 15;
     static int numberOfSelectedParts = 5;
     static int numberOfGenerations = 400;
-    static double mutationRate = 0.4;
-    static double mutationPositionRate = 0.05;
+    static double crossingRate = 0.4;
+    static double crossingRandomPositionRate = 0.05;
   
     public static void main(String[] args) {
         
@@ -62,7 +62,7 @@ public class AlgGen {
         
         for(int i = 0; i < numberOfGenerations - 1; i++) {
             int lastWeight = bestPopulation[0].getWeight();
-            population.rePopulate(nVertex, graph, mutationRate, mutationPositionRate);
+            population.rePopulate(nVertex, graph, crossingRate, crossingRandomPositionRate);
             bestPopulation = population.naturalSelection(numberOfSelectedIndividuals, nVertex, lastWeight);
             bestParts = population.getBestPart();
             String patch = "NaN";

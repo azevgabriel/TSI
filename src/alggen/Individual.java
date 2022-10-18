@@ -19,17 +19,17 @@ public class Individual {
     private final int[] nodes;
     private int weight; 
     private final int[] positions;
-    private final int mutationRate;
-    private final int mutationPositionRate;
+    private final int crossingRate;
+    private final int crossingRandomPositionRate;
     private final int[][] graph;
     private Part partSelected;
     
-    public Individual(int numberOfNodes, double mutationRate, double mutationPositionRate, int[][] graph) {
+    public Individual(int numberOfNodes, double crossingRate, double crossingRandomPositionRate, int[][] graph) {
         this.length = numberOfNodes;
         this.nodes = new int[numberOfNodes];
         this.positions = new int[numberOfNodes];
-        this.mutationRate = (int)(mutationRate * 100);
-        this.mutationPositionRate = (int)(mutationPositionRate * 100);
+        this.crossingRate = (int)(crossingRate * 100);
+        this.crossingRandomPositionRate = (int)(crossingRandomPositionRate * 100);
         this.graph = graph;
         this.partSelected = null;
         
@@ -44,10 +44,10 @@ public class Individual {
         this.weight = individual.getWeight();
         this.length = individual.getLength();
         this.positions = individual.getPositions();
-        this.mutationRate = individual.getMutationRate();
+        this.crossingRate = individual.getCrossingRate();
         this.graph = individual.getGraph();
         this.partSelected = individual.getPartSelected();
-        this.mutationPositionRate = individual.getMutationPositionRate();
+        this.crossingRandomPositionRate = individual.getCrossingRandomPositionRate();
     };
     
     public void createTotalRandom(int cofOfMaxInterations) {
@@ -116,7 +116,7 @@ public class Individual {
         int mutationChance = Math.round(rnd.nextInt((100 * 1000) / 1000));
         int mutationPositionChance = Math.round(rnd.nextInt((100 * 1000) / 1000));
         
-        if (mutationChance < this.mutationRate && numberOfParts > 0) {
+        if (mutationChance < this.crossingRate && numberOfParts > 0) {
             int pickPart = Math.round(rnd.nextInt(numberOfParts * 1000)/1000);
 
             String[] partsStringify = parts[pickPart].getDNA().split(",");
@@ -124,7 +124,8 @@ public class Individual {
             
             int positionPickPart = parts[pickPart].getPosition();
             
-            if (mutationPositionChance < this.mutationPositionRate) positionPickPart = Math.round(rnd.nextInt(((this.length - partsStringify.length) * 1000) / 1000));
+            if (mutationPositionChance < this.crossingRandomPositionRate) 
+                positionPickPart = Math.round(rnd.nextInt(((this.length - partsStringify.length) * 1000) / 1000));
                         
             this.partSelected = parts[pickPart];
             
@@ -258,12 +259,12 @@ public class Individual {
         return this.positions;
     }
     
-    public int getMutationRate() {
-        return this.mutationRate;
+    public int getCrossingRate() {
+        return this.crossingRate;
     }
     
-    public int getMutationPositionRate() {
-        return this.mutationPositionRate;
+    public int getCrossingRandomPositionRate() {
+        return this.crossingRandomPositionRate;
     }
     
     public Part getPartSelected() {
