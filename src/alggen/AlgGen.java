@@ -12,17 +12,17 @@ import java.util.ArrayList;
  */
 
 public class AlgGen {
-    static int numberOfPopulation = 220000;
-    static int numberOfSelectedIndividuals = 15;
+    static int numberOfPopulation = 250000;
+    static int numberOfSelectedIndividuals = 25;
     static int numberOfSelectedParts = 5;
-    static int numberOfGenerations = 400;
+    static int numberOfGenerations = 100;
     static double crossingRate = 0.4;
     static double crossingRandomPositionRate = 0.05;
   
     public static void main(String[] args) {
         
         FileManager fileManager = new FileManager();
-        ArrayList<String> text = fileManager.stringReader("./src/data/Teste_2.txt");
+        ArrayList<String> text = fileManager.stringReader("./src/data/Teste.txt");
        
         int nVertex = 0;
         int graph[][] = null;

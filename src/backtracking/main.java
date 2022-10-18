@@ -17,11 +17,9 @@ import java.util.Arrays;
 public class main {
 
     public static int[] bestPath = new int[100];
-    public static int bestWeight = 9999;
+    public static int bestWeight = 99999;
     
     public static void main(String[] args) {
-        // TODO code application logic here
-        
         FileManager fileManager = new FileManager();
         ArrayList<String> text = fileManager.stringReader("./src/data/Teste.txt");
         
