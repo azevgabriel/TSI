@@ -8,8 +8,8 @@ package backtracking;
 import java.util.ArrayList;
 
 /**
- *
- * @author Douglas
+  *@author Gabriel Azevedo
+ * @author Douglas Castilho
  */
 public class AdjMatrix implements Graph {
 

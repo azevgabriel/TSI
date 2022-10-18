@@ -8,7 +8,7 @@ import java.util.Random;
 
 /**
  * @RA 201811020032
- * @author gaga1
+ * @author Gabriel Azevedo
  */
 public class Array {
     

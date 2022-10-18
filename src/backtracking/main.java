@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * @author Douglas
- * @coauthor Gabriel
+ * @author Douglas Castilho
+ * @author Gabriel Azevedo
  */
 
 public class main {
@@ -75,8 +75,6 @@ public class main {
                 System.out.println(Arrays.toString(path));
                 System.out.println(weight);
             }
-
-            
         } else if (pos >= graph.getVertexSize()) {
         } else {
             ShortWay sW = graph.getAdjVertex(node);
@@ -89,17 +87,15 @@ public class main {
                         
                         int nextWeight = weight;
                         
-                        if(pos > 0) {
+                        if(pos > 0) 
                             nextWeight = nextWeight + sW.getWeightByIndex(j);
-                        }
-                       
-                        if (nextWeight < bestWeight) {
-                            av[i] = false;
+
+                           av[i] = false;
                             path[pos] = i;
                             pos++;
-
+                       
+                        if (nextWeight < bestWeight) 
                             backTracking(i, path, av, pos, graph, nextWeight);
-                        }
                         
                         pos--;
                         av[i] = true;

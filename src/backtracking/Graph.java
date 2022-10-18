@@ -8,9 +8,9 @@ package backtracking;
 import java.util.ArrayList;
 
 /**
- *
- * @author Douglas
+ * @author Douglas Castilho
  */
+
 public interface Graph {
     
     public void setEdge (int ori, int target, int weight);

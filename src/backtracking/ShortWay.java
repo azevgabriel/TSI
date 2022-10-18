@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author gaga1
+ * @author Gabriel Azevedo
  */
 public class ShortWay {
     public ArrayList<Integer> adj;
